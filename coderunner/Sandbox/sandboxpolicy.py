@@ -127,8 +127,15 @@ class SelectiveOpenPolicy(SandboxPolicy):
         a.type, a.data = S_ACTION_KILL, S_RESULT_RF
         return a
 
+    def _KILL_RT(self, e, a): # runtime error
+        self.error = "INVALID MEMORY ACCESS (#{0},{1})".format(e.data, e.ext1)
+        a.type, a.data = S_ACTION_KILL, S_RESULT_RT
+        return a
+
     def SYS_open(self, e, a):
         pathBytes, mode = self.sbox.dump(T_STRING, e.ext1), e.ext2
+        if pathBytes is None:
+            return self._KILL_RT(e, a)
         path = pathBytes.decode('utf8').strip()
         path = collapseDotDots(path)
 
@@ -151,6 +158,8 @@ class SelectiveOpenPolicy(SandboxPolicy):
 
     def SYS_unlink(self, e, a):
         pathBytes = self.sbox.dump(T_STRING, e.ext1)
+        if pathBytes is None:
+            return self._KILL_RT(e, a)
         path = pathBytes.decode('utf8')
         if path.startswith('/tmp/'):
             return self._CONT(e, a)
