@@ -83,9 +83,10 @@ class qtype_coderunner_renderer extends qtype_renderer {
         $responsefieldid = 'id_' . $responsefieldname;
         $ta_attributes = array(
             'class' => 'coderunner-answer edit_code',
-            'name' => $responsefieldname,
-            'id' => $responsefieldid,
+            'name'  => $responsefieldname,
+            'id'    => $responsefieldid,
             'cols'      => '80',
+            'spellcheck' => 'false',
             'rows'      => 18
         );
 
@@ -185,6 +186,8 @@ class qtype_coderunner_renderer extends qtype_renderer {
             }
 
             $fb .= html_writer::start_tag('div', array('class' => $resultsclass));
+            // Hack to insert run host as hidden comment in html
+            $fb .= "\n<!-- Run on {$testOutcome->runHost} -->\n";
             $fb .= html_writer::tag('p', '&nbsp;', array('class' => 'coderunner-spacer'));
             if ($testOutcome->hasSyntaxError()) {
                 $fb .= html_writer::tag('h3', 'Syntax Error(s)');
